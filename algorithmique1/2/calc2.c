@@ -1,10 +1,15 @@
+// Version amélioré de calc.c
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
+// fail_if : Permet de stopper le programme lors d'une erreur.
+// Prend en paramètre une expression booléenne et un pointeur vers une chaîne de
+// caractère.
+// Retourne rien.
 void fail_if(int expr, const char *cause);
-
 
 #define STR(s) #s
 #define XSTR(s) STR(s)
@@ -17,9 +22,20 @@ typedef struct stack {
   int height;
 } stack;
 
+// stack_init : Permet d'intinitialiser la hauteur de la pile à 0, prend en
+// paramètre un pointeur vers une structure stack.
 void stack_init(stack *s);
-int stack_height(const stack * s);
-void stack_push(stack * s, long int x);
+
+// stack_height : Permet de connaître la hauteur de la pile à l'instant de
+// l'appel. Prend en paramètre un pointeur vers une structure stack.
+int stack_height(const stack *s);
+
+// stack_push : Permet de rajouter un élément dans la pile, prend en paramètre
+// un pointeur vers une structure stack et un long int.
+void stack_push(stack *s, long int x);
+
+// stack_pop : Permet de récupérer le dernier élément enregistré dans la pile et
+// prend en paramètre un pointeur vers une structure stack.
 long int stack_pop(stack *s);
 
 #define ADD "ADD"
@@ -50,25 +66,22 @@ int main(void) {
       if (strcmp(s, END) == 0) {
         fail_if(stack_height(&pile) != 1, "missplaced operator");
         printf("Result: %ld\n", stack_pop(&pile));
-      }
-      fail_if(stack_height(&pile) <= 1, "stack underflown");
-      long int y = stack_pop(&pile);
-      x = stack_pop(&pile);
-      if (strcmp(s, ADD) == 0) {
-        stack_push(&pile, y + x);
-      } else if (strcmp(s, MUL) == 0) {
-        stack_push(&pile, y * x);
-      } else if (strcmp(s, SUB) == 0) {
-        // Soustraction du therme le moins profond au therme le plus profond
-        stack_push(&pile, y - x);
-      } else if (strcmp(s, QUO) == 0) {
-        fail_if(x == 0, "illegal division");
-        // Division du therme le plus profond par le therme le moins profond
-        stack_push(&pile, y / x);
-      } else if (strcmp(s, REM) == 0) {
-        fail_if(x == 0, "illegal division");
-        // Division du therme le plus profond par le therme le moins profond
-        stack_push(&pile, y % x);
+      } else {
+        long int y = stack_pop(&pile);
+        x = stack_pop(&pile);
+        if (strcmp(s, ADD) == 0) {
+          stack_push(&pile, y + x);
+        } else if (strcmp(s, MUL) == 0) {
+          stack_push(&pile, y * x);
+        } else if (strcmp(s, SUB) == 0) {
+          stack_push(&pile, y - x);
+        } else if (strcmp(s, QUO) == 0) {
+          fail_if(x == 0, "illegal division");
+          stack_push(&pile, y / x);
+        } else if (strcmp(s, REM) == 0) {
+          fail_if(x == 0, "illegal division");
+          stack_push(&pile, y % x);
+        }
       }
     }
   }
@@ -87,18 +100,19 @@ void stack_init(stack *s) {
   s->height = 0;
 }
 
-int stack_height (const stack * s) {
+int stack_height(const stack *s) {
   return s->height;
 }
 
-void stack_push(stack * s, long int x) {
+void stack_push(stack *s, long int x) {
   fail_if(stack_height(s) == SIZE_STACK, "stack overflow");
   s->height += 1;
   s->value[s->height] = x;
 }
 
-long int stack_pop(stack * s) {
-  fail_if(stack_height(s) == 0, "stack underflow");
+long int stack_pop(stack *s) {
+  fail_if(stack_height(s) < 0, "stack underflow");
+  long int x = (long int) s->value[s->height];
   s->height -= 1;
-  return s->value[stack_height(s)];
+  return x;
 }
