@@ -112,18 +112,22 @@ int main(int argc, char *argv[]) {
   };
 
   parameter p[argc];
-  int k = 1;
+  // IB : k >= 0 && k <= argc
+  // Q.C : k
+  int k = 0;
   while (k < argc) {
+    ++k;
     const char *result = parameter_initialize(&p[k], argv[k]);
     fail_if(result != NULL, "An error as occcured");
-    ++k;
   }
 
   size_t taille = sizeof(personnage) / sizeof(character);
-  int i = 1;
+  int i = 0;
+  // IB : k >= 0 && k <= argc
+  // Q.C : i
   while (i < argc) {
-    parameter_execute(&p[i], personnage,  taille);
     ++i;
+    parameter_execute(&p[i], personnage,  taille);
   }
 
   return EXIT_SUCCESS;
@@ -141,7 +145,7 @@ void fail_if(int expr, const char *cause) {
   exit(EXIT_FAILURE);
 }
 
-const char *parameter_initialize(parameter *p, const char *s) {
+const char *parameter_initialize(parameter *p, const char * s) {
   errno = 0;
   char *end;
   long int x = strtol(s, &end, 10);
@@ -160,14 +164,22 @@ const char *parameter_initialize(parameter *p, const char *s) {
 void parameter_execute(parameter *p, const character *q, size_t n) {
   if (p->category == NUMBER) {
     printf("--- characters appearing for the first time in %ld :\n", p->number);
-    for (size_t i = 0; i < n; i++) {
+    size_t k = 0;
+    // k => 0 && k <= n
+    // Q.C : k
+    while (k < n) {
+      ++k;
       if (q[i].yearfirstapp == p->number) {
         character_display_names(&q[i]);
       }
     }
   } else if (p->category == STRING) {
     printf("--- characters whose first or last names contain \"%s\" :\n", p->string);
-    for (size_t i = 0; i < n; i++) {
+    size_t k = 0;
+    // k >= 0 && k <= n
+    // Q.C : k 
+    while (k < n) {
+      ++k;
       if (strstr(q[i].lastname, p->string) || strstr(q[i].firstname, p->string)) {
         character_display_names(&q[i]);
       }
