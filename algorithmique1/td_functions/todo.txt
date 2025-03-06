@@ -1,0 +1,5 @@
+- fcopy.c
+=> Version qui prend bloc par bloc avec "fread" 
+=> Essayer de personnaliser les messages d'erreurs
+
+- fhamming
