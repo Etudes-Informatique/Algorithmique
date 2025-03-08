@@ -150,7 +150,7 @@ const char *parameter_initialize(parameter *p, const char * s) {
   char *end;
   long int x = strtol(s, &end, 10);
   if (*end == '\0') {
-    fail_if(errno != 0, "An error as occured");
+    fail_if(errno != 0, "Value out of range");
     p->category = NUMBER;
     p->number = x;
     return NULL;
