@@ -116,9 +116,9 @@ int main(int argc, char *argv[]) {
   // Q.C : k
   int k = 0;
   while (k < argc) {
-    ++k;
-    const char *result = parameter_initialize(&p[k], argv[k]);
+    const char *result = parameter_initialize(&p[k], argv[k+1]);
     fail_if(result != NULL, "An error as occcured");
+    ++k;
   }
 
   size_t taille = sizeof(personnage) / sizeof(character);
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
   // IB : k >= 0 && k <= argc
   // Q.C : i
   while (i < argc) {
-    ++i;
     parameter_execute(&p[i], personnage,  taille);
+    ++i;
   }
 
   return EXIT_SUCCESS;
