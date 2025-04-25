@@ -1,2 +1,4 @@
 # Algorithmique
-Algorithmique - Licence Information 
+Algorithmique - Licence Informatique 
+
+Algo1 => 1ière Année 
