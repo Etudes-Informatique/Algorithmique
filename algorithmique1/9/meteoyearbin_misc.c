@@ -353,7 +353,7 @@ bool report_frost_cond(const report *p) {
 }
 
 int report_tx_compar(const report *p1, const report *p2) {
-  return (int) (p1->tx - p2->tx);
+  return (p1->tx > p2->tx) - (p1->tx < p2->tx);
 }
 
 bool report_heatwave_cond(const report *p) {
@@ -361,5 +361,5 @@ bool report_heatwave_cond(const report *p) {
 }
 
 int report_tx_compar_bis(const report *p1, const report *p2) {
-  return (int) (p2->tx - p1->tx);
+  return (p2->tx > p1->tx) - (p2->tx < p1->tx);
 }
