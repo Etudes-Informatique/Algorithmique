@@ -98,6 +98,7 @@ void right_insert(void *base, size_t nmemb, size_t size, int (*compar)(
   }
 }
 
+// Pas trop sûr du résultat !
 void mergebinsteps_sort(void *base, size_t nmemb, size_t size,
     int (*compar)(const void *, const void *)) {
   if (nmemb <= 1) {
