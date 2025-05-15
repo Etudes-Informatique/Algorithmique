@@ -55,7 +55,7 @@ void mem_swap(void *s1, void *s2, size_t size) {
   char *p1 = s1;
   char *p2 = s2;
   for (size_t k = 0; k < size; ++k) {
-    char c = *p2;
+    char c = *p1;
     *p1 = *p2;
     *p2 = c;
     ++p1;
@@ -99,8 +99,7 @@ void right_insert(void *base, size_t nmemb, size_t size, int (*compar)(
 }
 
 // Pas trop sûr du résultat !
-void mergebinsteps_sort(void *base, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *)) {
+void mergebinsteps_sort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *)) {
   if (nmemb <= 1) {
     return;
   }
@@ -114,7 +113,7 @@ void mergebinsteps_sort(void *base, size_t nmemb, size_t size,
       for (size_t j = mid; j < right; ++j) {
         right_insert((char *) base + left * size, j - left + 1, size, compar);
       }
-      i = right;
+      k = right;
     }
     width *= 2;
   }
