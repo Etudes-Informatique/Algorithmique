@@ -1,5 +1,6 @@
 #include "array.h"
 #include <stdio.h>
+#include <string.h>
 
 // mem_swap : échange les contenus des zones mémoires de taille size pointées
 // par s1 et s2. Les zones supposées ne pas se recouvrir.
@@ -9,10 +10,10 @@ void mem_swap(void *s1, void *s2, size_t size);
 // est supérieur ou égal à 1, le prefix de la longueur nmemb-1 est supposé trié
 // dans l'odre croissant au sens de compar.
 void right_insert(void *base, size_t nmemb, size_t size, int (*compar)(
-    const void *, const void *));
+      const void *, const void *));
 
 size_t cond_count(const void *base, size_t nmemb, size_t size, bool (*cond)(
-    const void *)) {
+      const void *)) {
   const char *ptr = base;
   size_t n = 0;
   while (ptr < (char *) base + nmemb * size) {
@@ -22,8 +23,9 @@ size_t cond_count(const void *base, size_t nmemb, size_t size, bool (*cond)(
   return n;
 }
 
-void *cond_left_search(const void *base, size_t nmemb, size_t size, bool (*cond)(
-    const void *)) {
+void *cond_left_search(const void *base, size_t nmemb, size_t size,
+    bool (*cond)(
+      const void *)) {
   const char *ptr = base;
   while (ptr < (char *) base + nmemb * size) {
     if (cond(ptr)) {
@@ -34,9 +36,10 @@ void *cond_left_search(const void *base, size_t nmemb, size_t size, bool (*cond)
   return NULL;
 }
 
-void *min_left_search(const void *base, size_t nmemb, size_t size, int (*compar)(
-    const void *,
-    const void *)) {
+void *min_left_search(const void *base, size_t nmemb, size_t size,
+    int (*compar)(
+      const void *,
+      const void *)) {
   if (nmemb == 0) {
     return NULL;
   }
@@ -64,7 +67,7 @@ void mem_swap(void *s1, void *s2, size_t size) {
 }
 
 void select_sort(void *base, size_t nmemb, size_t size, int (*compar)(
-    const void *, const void *)) {
+      const void *, const void *)) {
   if (nmemb <= 1) {
     return;
   }
@@ -78,7 +81,7 @@ void select_sort(void *base, size_t nmemb, size_t size, int (*compar)(
 }
 
 void insert_sort(void *base, size_t nmemb, size_t size, int (*compar)(
-    const void *, const void *)) {
+      const void *, const void *)) {
   size_t k = 1;
   while (k < nmemb) {
     right_insert(base, k, size, compar);
@@ -87,7 +90,7 @@ void insert_sort(void *base, size_t nmemb, size_t size, int (*compar)(
 }
 
 void right_insert(void *base, size_t nmemb, size_t size, int (*compar)(
-    const void *, const void *)) {
+      const void *, const void *)) {
   if (nmemb <= 1) {
     return;
   }
@@ -98,22 +101,51 @@ void right_insert(void *base, size_t nmemb, size_t size, int (*compar)(
   }
 }
 
-// Pas trop sûr du résultat !
-void mergebinsteps_sort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *)) {
-  if (nmemb <= 1) {
+// -------------------
+void merge(char *p1, size_t n1, char *p2, size_t n2, size_t size,
+    int (*compar)(const void *, const void *), char *temp) {
+  char *q1 = p1;
+  char *q2 = p2;
+  char *t = temp;
+  size_t k1 = 0;
+  size_t k2 = 0;
+  while (k1 < n1 || k2 < n2) {
+    if (k2 >= n2 || (k1 < n1 && compar(q1, q2) <= 0)) {
+      memcpy(t, q1, size);
+      q1 += size;
+      ++k1;
+    } else {
+      memcpy(t, q2, size);
+      q2 += size;
+      ++k2;
+    }
+    t += size;
+  }
+  t = temp;
+  for (size_t i = 0; i < n1 + n2; ++i) {
+    mem_swap(p1 + i * size, t + i * size, size);
+  }
+}
+
+void mergebinsteps_sort(void *base, size_t nmemb, size_t size,
+    int (*compar)(const void *, const void *)) {
+  if (nmemb < 2) {
     return;
   }
+  char temp[nmemb * size];
   size_t width = 1;
   while (width < nmemb) {
-    size_t k = 0;
-    while (k + width < nmemb) {
-      size_t left = k;
-      size_t mid = k + width;
-      size_t right = (mid + width < nmemb) ? mid + width : nmemb;
-      for (size_t j = mid; j < right; ++j) {
-        right_insert((char *) base + left * size, j - left + 1, size, compar);
+    size_t i = 0;
+    while (i < nmemb) {
+      size_t l = i;
+      size_t m = (i + width < nmemb) ? i + width : nmemb;
+      size_t r = (i + 2 * width < nmemb) ? i + 2 * width : nmemb;
+      if (m < r) {
+        char *p1 = (char *) base + l * size;
+        char *p2 = (char *) base + m * size;
+        merge(p1, m - l, p2, r - m, size, compar, temp);
       }
-      k = right;
+      i += 2 * width;
     }
     width *= 2;
   }
